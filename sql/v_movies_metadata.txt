@@ -1,0 +1,35 @@
+-- movies_dwh.v_movies_metadata source
+
+create or replace
+algorithm = UNDEFINED view `movies_dwh`.`v_movies_metadata` as
+select
+    `movies_dwh`.`movies_metadata`.`movie_id` as `movie_id`,
+    `movies_dwh`.`movies_metadata`.`original_title` as `original_title`,
+    `movies_dwh`.`movies_metadata`.`title` as `title`,
+    `movies_dwh`.`movies_metadata`.`overview` as `overview`,
+    `movies_dwh`.`movies_metadata`.`original_language` as `original_language`,
+    `movies_dwh`.`movies_metadata`.`homepage` as `homepage`,
+    `movies_dwh`.`movies_metadata`.`budget` as `budget`,
+    `movies_dwh`.`movies_metadata`.`adult` as `adult`,
+    `movies_dwh`.`movies_metadata`.`imdb_id` as `imdb_id`,
+    `movies_dwh`.`movies_metadata`.`movie_id_ratings` as `movie_id_ratings`,
+    `movies_dwh`.`movies_metadata`.`popularity` as `popularity`,
+    `movies_dwh`.`movies_metadata`.`release_date` as `release_date`,
+    `movies_dwh`.`movies_metadata`.`revenue` as `revenue`,
+    `movies_dwh`.`movies_metadata`.`RUNTIME` as `RUNTIME`,
+    `movies_dwh`.`movies_metadata`.`status` as `status`,
+    `movies_dwh`.`movies_metadata`.`tagline` as `tagline`,
+    `movies_dwh`.`movies_metadata`.`video` as `video`,
+    `movies_dwh`.`movies_metadata`.`vote_average` as `vote_average`,
+    `movies_dwh`.`movies_metadata`.`vote_count` as `vote_count`,
+    `movies_dwh`.`movies_metadata`.`collection_name` as `collection_name`,
+    `movies_dwh`.`movies_metadata`.`poster_path` as `poster_path`,
+    `movies_dwh`.`movies_metadata`.`backdrop_path` as `backdrop_path`
+from
+    `movies_dwh`.`movies_metadata`
+where
+    `movies_dwh`.`movies_metadata`.`movie_id_ratings` in (
+    select
+        distinct `movies_dwh`.`ratings`.`movie_id`
+    from
+        `movies_dwh`.`ratings`);

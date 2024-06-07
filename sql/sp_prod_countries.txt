@@ -1,0 +1,14 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `movies_dwh`.`sp_prod_countries`()
+begin 
+	drop table if exists movies_dwh.production_countries;
+	create table movies_dwh.production_countries 
+	select distinct
+		movie_production_country_id,
+		movie_id,
+		pc.production_country_id,
+		iso_3166_1 as production_country_code,
+		production_country_name
+	from movies_transactions.movies_production_countries pc
+	left join movies_transactions.production_countries pc2
+		on pc.production_country_id = pc2.production_country_id;
+end

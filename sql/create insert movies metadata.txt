@@ -1,0 +1,52 @@
+create table if not exists movies_transactions.movies_metadata (
+	movie_id INT,
+	original_title VARCHAR(255),
+	title VARCHAR(255),
+	overview mediumtext,
+	original_language VARCHAR(2),
+	homepage mediumtext,
+	budget INT,
+	adult binary,
+	imdb_id INT,
+	popularity FLOAT,
+	poster_path mediumtext,
+	release_date DATE,
+	revenue INT,
+	RUNTIME INT,
+	status VARCHAR(50),
+	tagline mediumtext,
+	video binary,
+	vote_average FLOAT,
+	vote_count INT,
+	constraint pk_movies_metadata primary key (movie_id)
+);
+
+insert into movies_transactions.movies_metadata (movie_id, original_title, title, overview, original_language, homepage, 
+	budget, adult, imdb_id, popularity, poster_path, release_date, revenue, RUNTIME, status, tagline, video, 
+	vote_average, vote_count)
+select distinct 
+	movie_id, 
+	original_title, 
+	title, 
+	overview, 
+	original_language, 
+	homepage, 
+	budget, 
+	adult, 
+	imdb_id, 
+	MAX(popularity), 
+	poster_path, 
+	case 
+		when release_date = '0000-00-00' then '1900-01-01'
+		else release_date 
+	end as release_date,
+	revenue, 
+	RUNTIME, 
+	status, 
+	tagline, 
+	video, 
+	vote_average, 
+	MAX(vote_count)
+from movies_raw.movies_metadata 
+where title not like ''
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18;

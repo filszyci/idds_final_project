@@ -1,0 +1,11 @@
+create table if not exists movies_transactions.keywords (
+	keyword_id INT,
+	keyword_name VARCHAR(255),
+	constraint pk_keyword primary key (keyword_id)
+);
+
+insert into movies_transactions.keywords (keyword_id, keyword_name)
+select distinct 
+	keyword_id,
+	keyword_name
+from movies_transactions.movies_keywords;

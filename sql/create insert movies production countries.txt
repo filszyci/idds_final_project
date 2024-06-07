@@ -1,0 +1,12 @@
+create table if not exists movies_transactions.movies_production_countries (
+	movie_production_country_id INT,
+	movie_id INT,
+	production_country_id INT,
+	constraint pk_movies_production_countries primary key (movie_production_country_id),
+	constraint fk_movies_production_countries_movie foreign key (movie_id)
+		references movies_transactions.movies(movie_id),
+	constraint fk_movies_production_countries_country foreign key (production_country_id)
+		references movies_transactions.production_countries(production_country_id)
+);
+
+truncate table movies_transactions.movies_production_countries;

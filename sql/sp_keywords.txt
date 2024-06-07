@@ -1,0 +1,13 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `movies_dwh`.`sp_keywords`()
+begin 
+	drop table if exists movies_dwh.keywords;
+	create table movies_dwh.keywords 
+	select distinct
+		movie_keyword_id,
+		movie_id,
+		mk.keyword_id,
+		keyword_name
+	from movies_transactions.movies_keywords mk
+	left join movies_transactions.keywords k
+		on mk.keyword_id = k.keyword_id;
+end

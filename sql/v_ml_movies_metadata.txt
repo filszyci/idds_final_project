@@ -1,0 +1,35 @@
+-- movies_dwh.v_ml_movies_metadata source
+
+create or replace
+algorithm = UNDEFINED view `movies_dwh`.`v_ml_movies_metadata` as
+select
+    `mm`.`movie_id` as `movie_id`,
+    `mm`.`original_title` as `original_title`,
+    `mm`.`title` as `title`,
+    `mm`.`overview` as `overview`,
+    `mm`.`original_language` as `original_language`,
+    `mm`.`homepage` as `homepage`,
+    `mm`.`budget` as `budget`,
+    `mm`.`adult` as `adult`,
+    `mm`.`imdb_id` as `imdb_id`,
+    `mm`.`movie_id_ratings` as `movie_id_ratings`,
+    `mm`.`popularity` as `popularity`,
+    `mm`.`release_date` as `release_date`,
+    `mm`.`revenue` as `revenue`,
+    `mm`.`RUNTIME` as `RUNTIME`,
+    `mm`.`status` as `status`,
+    `mm`.`tagline` as `tagline`,
+    `mm`.`video` as `video`,
+    `mm`.`vote_average` as `vote_average`,
+    `mm`.`vote_count` as `vote_count`,
+    `mm`.`collection_name` as `collection_name`,
+    `mm`.`poster_path` as `poster_path`,
+    `mm`.`backdrop_path` as `backdrop_path`,
+    `k`.`keyword_name` as `keyword_name`,
+    `g`.`genre_name` as `genre_name`
+from
+    ((`movies_dwh`.`movies_metadata` `mm`
+left join `movies_dwh`.`keywords` `k` on
+    (`mm`.`movie_id` = `k`.`movie_id`))
+left join `movies_dwh`.`genres` `g` on
+    (`mm`.`movie_id` = `g`.`movie_id`));

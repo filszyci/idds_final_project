@@ -1,0 +1,18 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `movies_dwh`.`sp_genres`()
+begin 
+	drop table if exists movies_dwh.genres;
+	create table movies_dwh.genres 
+	select distinct
+		movie_genre_id,
+		movie_id,
+		g.genre_id,
+		case 
+			when genre_name not in ('TV Movie', 'Western', 'War', 'History', 'Music', 'Foreign', 'Animation',
+				'Fantasy', 'Mystery', 'Family', 'Science Fiction', 'Adventure', 'Documentary',
+				'Crime', 'Horror', 'Action', 'Romance', 'Thriller', 'Comedy', 'Drama') then 'Other'
+			else genre_name
+		end as genre_name
+	from movies_transactions.movies_genres mg
+	left join movies_transactions.genres g 
+		on mg.genre_id = g.genre_id;
+end

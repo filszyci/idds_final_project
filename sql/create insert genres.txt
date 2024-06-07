@@ -1,0 +1,11 @@
+create table if not exists movies_transactions.genres (
+	genre_id INT,
+	genre_name VARCHAR(255),
+	constraint pk_genre primary key (genre_id)
+);
+
+insert into movies_transactions.genres (genre_id, genre_name)
+select distinct 
+	genre_id,
+	genre_name
+from movies_transactions.movies_genres;

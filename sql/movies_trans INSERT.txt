@@ -1,0 +1,209 @@
+insert into movies_transactions.users (user_id, user_name) 
+select distinct user_id, null as user_name from movies_raw.ratings;
+
+insert into movies_transactions.ratings (user_id, movie_id, rating, original_timestamp)
+select 
+	user_id,
+	movie_id,
+	rating,
+	original_timestamp
+from movies_raw.ratings;
+
+truncate table movies_transactions.movies_production_countries;
+alter table movies_transactions.movies_production_companies
+add column production_company_name VARCHAR(255);
+insert into movies_transactions.movies_production_companies (movie_production_company_id, production_company_id, movie_id, production_company_name)
+select
+	row_number() over () as movie_production_company_id,
+	pc2.production_company_id, 
+	pc.movie_id,
+	pc2.production_company_name
+from movies_raw.production_companies pc
+left join (
+	select 
+		row_number() over () as production_company_id,
+		production_company_name 
+	from (
+		select distinct 
+			production_company_name  
+		from movies_raw.production_companies) pc1
+	) pc2 on pc2.production_company_name = pc.production_company_name ;
+
+insert into movies_transactions.production_companies (production_company_id, production_company_name)
+select distinct 
+	production_company_id,
+	production_company_name
+from movies_transactions.movies_production_companies;
+
+insert into movies_transactions.movies_metadata (movie_id, original_title, title, overview, original_language, homepage, 
+	budget, adult, imdb_id, popularity, poster_path, release_date, revenue, RUNTIME, status, tagline, video, 
+	vote_average, vote_count)
+select distinct 
+	movie_id, 
+	original_title, 
+	title, 
+	overview, 
+	original_language, 
+	homepage, 
+	budget, 
+	adult, 
+	imdb_id, 
+	MAX(popularity), 
+	poster_path, 
+	case 
+		when release_date = '0000-00-00' then '1900-01-01'
+		else release_date 
+	end as release_date,
+	revenue, 
+	RUNTIME, 
+	status, 
+	tagline, 
+	video, 
+	vote_average, 
+	MAX(vote_count)
+from movies_raw.movies_metadata 
+where title not like ''
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18;
+
+
+alter table movies_transactions.movies_keywords
+add column keyword_name VARCHAR(255);
+insert into movies_transactions.movies_keywords (movie_keyword_id, keyword_id, movie_id, keyword_name)
+select
+	row_number() over () as movie_keyword_id,
+	pc2.keyword_id, 
+	pc.movie_id,
+	pc2.keyword_name
+from movies_raw.keywords pc
+left join (
+	select 
+		row_number() over () as keyword_id,
+		keyword_name 
+	from (
+		select distinct 
+			keyword_name  
+		from movies_raw.keywords) pc1
+	) pc2 on pc2.keyword_name = pc.keyword_name ;
+
+insert into movies_transactions.keywords (keyword_id, keyword_name)
+select distinct 
+	keyword_id,
+	keyword_name
+from movies_transactions.movies_keywords;
+
+
+alter table movies_transactions.movies_genres
+add column genre_name VARCHAR(255);
+insert into movies_transactions.movies_genres (movie_genre_id, genre_id, movie_id, genre_name)
+select
+	row_number() over () as movie_genre_id,
+	pc2.genre_id, 
+	pc.movie_id,
+	pc2.genre_name
+from movies_raw.genres pc
+left join (
+	select 
+		row_number() over () as genre_id,
+		genre_name 
+	from (
+		select distinct 
+			genre_name  
+		from movies_raw.genres) pc1
+	) pc2 on pc2.genre_name = pc.genre_name ;
+
+insert into movies_transactions.genres (genre_id, genre_name)
+select distinct 
+	genre_id,
+	genre_name
+from movies_transactions.movies_genres;
+
+truncate table movies_transactions.members;
+insert into movies_transactions.members (member_id, gender, member_name, profile_path)
+select
+	credit_id as member_id,
+	member_gender,
+	member_name,
+	profile_path
+from (
+	select distinct 
+		credit_id,
+		member_gender,
+		member_name,
+		profile_path
+	from movies_raw.crews
+	) a order by member_id ;
+	
+truncate table movies_transactions.crews;
+insert into movies_transactions.crews (crew_id, movie_id, member_id, department, job)
+select 
+	row_number() over () as crew_id,
+	movie_id,
+	member_id,
+	department,
+	job 
+from (
+	select distinct 
+		movie_id,
+		credit_id as member_id,
+		department,
+		job
+	from movies_raw.crews c) d;
+
+
+
+
+truncate table movies_transactions.actors;
+insert into movies_transactions.actors (actor_id, gender, actor_name, profile_path)
+select distinct
+	actor_id,
+	MAX(actor_gender),
+	actor_name,
+	MIN(profile_path)
+from  movies_raw.casts c
+where actor_name REGEXP '^[A-Za-z]'
+group by 1, 3;
+	
+insert into movies_transactions.casts (cast_id, movie_id, actor_id, `character`, `order`)
+select 
+	row_number() over () as cast_id,
+	movie_id,
+	actor_id,
+	`character`,
+	`order` 
+from (
+	select distinct
+		movie_id,
+		actor_id,
+		`character`,
+		`order`
+	from movies_raw.casts) c;
+
+ALTER TABLE movies_transactions.casts ADD COLUMN `character` VARCHAR(500);
+
+
+ALTER TABLE movies_transactions.collections ADD COLUMN movie_id INT;
+
+insert into movies_transactions.collections(collection_id, collection_name, poster_path, backdrop_path, movie_id)
+select distinct row_number() over () as collection_id, collection_name, poster_path, backdrop_path, movie_id
+from movies_raw.collections;
+
+select credit_id, count(credit_id) from movies_raw.crews c 
+group by credit_id having count(credit_id) > 1;
+
+select distinct * from movies_raw.crews c where credit_id = '52fe4381c3a36847f80590e9';
+
+select count(*) from (select distinct 
+		credit_id
+		#member_gender,
+		#member_name,
+		#profile_path
+	from movies_raw.crews) m ;
+
+select credit_id, count(credit_id) from movies_raw.crews c 
+group by credit_id having count(credit_id) > 1;
+
+select distinct * from movies_raw.crews where credit_id = '52fe4380c3a36847f80590dd';
+
+select member_name, count(*) from movies_transactions.members group by member_name having count(*) > 1;
+
+select * from movies_raw.crews where member_name = 'A. Kitman Ho';

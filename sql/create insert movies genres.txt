@@ -1,0 +1,28 @@
+create table if not exists movies_transactions.movies_genres (
+	movie_genre_id INT,
+	genre_id INT,
+	movie_id INT,
+	constraint pk_movie_genre primary key (movie_genre_id),
+	constraint fk_movie_genre_genre foreign key (genre_id) references movies_transactions.genres(genre_id),
+	constraint fk_movie_genre_movie foreign key (movie_id) references movies_transactions.movies(movie_id)
+);
+alter table movies_transactions.movies_genres auto_increment=1;
+
+alter table movies_transactions.movies_genres
+add column genre_name VARCHAR(255);
+insert into movies_transactions.movies_genres (movie_genre_id, genre_id, movie_id, genre_name)
+select
+	row_number() over () as movie_genre_id,
+	pc2.genre_id, 
+	pc.movie_id,
+	pc2.genre_name
+from movies_raw.genres pc
+left join (
+	select 
+		row_number() over () as genre_id,
+		genre_name 
+	from (
+		select distinct 
+			genre_name  
+		from movies_raw.genres) pc1
+	) pc2 on pc2.genre_name = pc.genre_name ;

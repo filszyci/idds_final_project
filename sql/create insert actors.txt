@@ -1,0 +1,17 @@
+create table if not exists movies_transactions.actors (
+	actor_id INT,
+	gender INT,
+	actor_name VARCHAR(255),
+	profile_path VARCHAR(255),
+	constraint pk_actor primary key (actor_id)
+);
+
+insert into movies_transactions.actors (actor_id, gender, actor_name, profile_path)
+select distinct
+	actor_id,
+	MAX(actor_gender),
+	actor_name,
+	MIN(profile_path)
+from  movies_raw.casts c
+where actor_name REGEXP '^[A-Za-z]'
+group by 1, 3;

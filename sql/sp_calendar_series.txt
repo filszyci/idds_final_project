@@ -1,0 +1,12 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `movies_dwh`.`sp_calendar_series`()
+begin 
+	set @max_date = (select FLOOR(max(original_timestamp)/(24*60*60)) from movies_dwh.ratings);
+	set @min_date = (select FLOOR(min(original_timestamp)/(24*60*60)) from movies_dwh.ratings);
+	set @diff = @max_date - @min_date;
+	drop table if exists movies_dwh.calendar_series;
+	create table movies_dwh.calendar_series
+	with recursive series as (
+	select 0 as value union all select value + 1 as value from series where series.value < @diff
+	)
+	select * from series;
+end

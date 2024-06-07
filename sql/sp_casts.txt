@@ -1,0 +1,17 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `movies_dwh`.`sp_casts`()
+begin 
+	drop table if exists movies_dwh.casts;
+	create table movies_dwh.casts 
+	select 
+		cast_id,
+		movie_id,
+		`character`,
+		`order`,
+		a.actor_id,
+		actor_name,
+		gender,
+		profile_path
+	from movies_transactions.casts c 
+	left join movies_transactions.actors a 
+		on a.actor_id = c.actor_id;
+end

@@ -1,0 +1,40 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `movies_dwh`.`sp_movies_metadata`()
+begin 
+	drop table if exists movies_dwh.movies_metadata;
+	create table movies_dwh.movies_metadata 
+	select distinct
+		mm.movie_id,
+		original_title,
+		title,
+		overview,
+		original_language,
+		homepage,
+		budget,
+		adult,
+		case 
+			when length(mm.imdb_id) = 0 then -1
+			else CAST(right(mm.imdb_id, 7) as INT) 
+		end as imdb_id,
+		l.movieId as movie_id_ratings,
+		popularity,
+		mm.poster_path
+		release_date,
+		revenue,
+		RUNTIME,
+		status,
+		tagline,
+		video,
+		vote_average,
+		vote_count,
+		c.collection_name,
+		c.poster_path,
+		c.backdrop_path
+	from movies_transactions.movies_metadata mm 
+	left join movies_transactions.collections c 
+		on c.movie_id = mm.movie_id
+	left join movies_raw.links l
+		on case 
+			when length(mm.imdb_id) = 0 then -1
+			else CAST(right(mm.imdb_id, 7) as INT) 
+		end  = l.imdb_id;
+end

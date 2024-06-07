@@ -1,0 +1,6 @@
+CREATE TRIGGER movies_transactions.tr_after_insert_rating
+AFTER INSERT ON movies_transactions.ratings
+FOR EACH ROW
+BEGIN
+    CALL movies_dwh.sp_ratings();
+END

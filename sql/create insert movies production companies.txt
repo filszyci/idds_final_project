@@ -1,0 +1,27 @@
+create table if not exists movies_transactions.movies_production_companies (
+	movie_production_company_id INT,
+	movie_id INT,
+	production_company_id INT,
+	constraint pk_movies_production_companies primary key (movie_production_company_id),
+	constraint fk_movie_production_companies_movie foreign key (movie_id) references movies_transactions.movies(movie_id),
+	constraint fk_movie_production_companies_company foreign key (production_company_id) 
+		references movies_transactions.production_companies(production_company_id)
+);
+alter table movies_transactions.movies_production_companies auto_increment = 1;
+
+insert into movies_transactions.movies_production_companies (movie_production_company_id, production_company_id, movie_id, production_company_name)
+select
+	row_number() over () as movie_production_company_id,
+	pc2.production_company_id, 
+	pc.movie_id,
+	pc2.production_company_name
+from movies_raw.production_companies pc
+left join (
+	select 
+		row_number() over () as production_company_id,
+		production_company_name 
+	from (
+		select distinct 
+			production_company_name  
+		from movies_raw.production_companies) pc1
+	) pc2 on pc2.production_company_name = pc.production_company_name ;

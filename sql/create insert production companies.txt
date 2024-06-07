@@ -1,0 +1,11 @@
+create table if not exists movies_transactions.production_companies (
+	production_company_id INT,
+	production_company_name VARCHAR(255),
+	constraint pk_production_companies primary key (production_company_id)
+);
+
+insert into movies_transactions.production_companies (production_company_id, production_company_name)
+select distinct 
+	production_company_id,
+	production_company_name
+from movies_transactions.movies_production_companies;

@@ -1,0 +1,13 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `movies_dwh`.`sp_prod_companies`()
+begin 
+	drop table if exists movies_dwh.production_companies;
+	create table movies_dwh.production_companies 
+	select distinct
+		movie_production_company_id,
+		movie_id,
+		pc.production_company_id,
+		production_company_name
+	from movies_transactions.movies_production_companies pc
+	left join movies_transactions.production_companies pc2
+		on pc.production_company_id = pc2.production_company_id;
+end

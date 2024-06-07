@@ -1,0 +1,23 @@
+create table if not exists movies_transactions.members (
+	member_id INT,
+	gender INT,
+	member_name VARCHAR(255),
+	profile_path VARCHAR(255),
+	constraint pk_member primary key (member_id)
+);
+alter table movies_transactions.members auto_increment=1;
+
+insert into movies_transactions.members (member_id, gender, member_name, profile_path)
+select
+	credit_id as member_id,
+	member_gender,
+	member_name,
+	profile_path
+from (
+	select distinct 
+		credit_id,
+		member_gender,
+		member_name,
+		profile_path
+	from movies_raw.crews
+	) a order by member_id ;

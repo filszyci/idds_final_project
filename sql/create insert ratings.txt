@@ -1,0 +1,14 @@
+create table if not exists movies_transactions.ratings (
+	rating_id INT,
+	user_id INT,
+	movie_id INT,
+	rating FLOAT,
+	original_timestamp INT,
+	constraint pk_rating primary key (rating_id),
+	constraint fk_rating_user foreign key (user_id) references movies_transactions.users(user_id),
+	constraint fk_rating_movie foreign key (movie_id) references movies_transactions.movies(movie_id)
+);
+alter table movies_transactions.ratings modify column rating_id INT auto_increment;
+
+insert into movies_transactions.ratings (user_id INT, movie_id, rating, original_timestamp)
+select * from movies_raw.ratings;

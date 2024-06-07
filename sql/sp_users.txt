@@ -1,0 +1,7 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `movies_dwh`.`sp_users`()
+begin 
+	drop table if exists movies_dwh.users;
+	create table movies_dwh.users
+	select *
+	from movies_transactions.users;
+end

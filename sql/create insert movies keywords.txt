@@ -1,0 +1,28 @@
+create table if not exists movies_transactions.movies_keywords (
+	movie_keyword_id INT,
+	movie_id INT,
+	keyword_id INT,
+	constraint pk_movie_keyword primary key (movie_keyword_id),
+	constraint fk_movie_keyword_movie foreign key (movie_id) references movies_transactions.movies(movie_id),
+	constraint fk_movie_keyword_keyword foreign key (keyword_id) references movies_transactions.keywords(keyword_id)
+);
+alter table movies_transactions.movies_keywords auto_increment=1;
+
+alter table movies_transactions.movies_keywords
+add column keyword_name VARCHAR(255);
+insert into movies_transactions.movies_keywords (movie_keyword_id, keyword_id, movie_id, keyword_name)
+select
+	row_number() over () as movie_keyword_id,
+	pc2.keyword_id, 
+	pc.movie_id,
+	pc2.keyword_name
+from movies_raw.keywords pc
+left join (
+	select 
+		row_number() over () as keyword_id,
+		keyword_name 
+	from (
+		select distinct 
+			keyword_name  
+		from movies_raw.keywords) pc1
+	) pc2 on pc2.keyword_name = pc.keyword_name ;

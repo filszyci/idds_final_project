@@ -1,0 +1,16 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `movies_dwh`.`sp_ratings`()
+begin 
+	create table if not exists movies_dwh.ratings(
+		rating_id INT,
+		user_id INT,
+		movie_id INT,
+		rating FLOAT,
+		original_timestamp INT
+	);
+	set @max_date = (select max(original_timestamp) from movies_dwh.ratings);
+	set @max_date = if(@max_date is null, 0, @max_date);
+	insert into movies_dwh.ratings (rating_id, user_id, movie_id, rating, original_timestamp)
+	select rating_id, user_id, movie_id, rating, original_timestamp
+	from movies_transactions.ratings 
+	where original_timestamp > @max_date;
+end

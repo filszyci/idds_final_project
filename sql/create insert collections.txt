@@ -1,0 +1,13 @@
+create table if not exists movies_transactions.collections (
+	collection_id INT,
+	collection_name VARCHAR(255),
+	poster_path VARCHAR(255),
+	backdrop_path VARCHAR(255),
+	constraint pk_collection primary key (collection_id)
+);
+
+ALTER TABLE movies_transactions.collections ADD COLUMN movie_id INT;
+
+insert into movies_transactions.collections(collection_id, collection_name, poster_path, backdrop_path, movie_id)
+select distinct row_number() over () as collection_id, collection_name, poster_path, backdrop_path, movie_id
+from movies_raw.collections;

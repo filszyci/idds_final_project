@@ -1,0 +1,17 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `movies_dwh`.`sp_crews`()
+begin 
+	drop table if exists movies_dwh.crews;
+	create table movies_dwh.crews 
+	select 
+		crew_id,
+		movie_id,
+		department,
+		job,
+		m.member_id,
+		member_name,
+		gender,
+		profile_path
+	from movies_transactions.crews c 
+	left join movies_transactions.members m 
+		on c.member_id = m.member_id;
+end

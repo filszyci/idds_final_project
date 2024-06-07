@@ -1,0 +1,12 @@
+-- movies_dwh.v_ml_ratings source
+
+create or replace
+algorithm = UNDEFINED view `movies_dwh`.`v_ml_ratings` as
+select
+    `movies_dwh`.`ratings`.`user_id` as `user_id`,
+    `movies_dwh`.`ratings`.`movie_id` as `movie_id`,
+    `movies_dwh`.`ratings`.`rating` as `rating`,
+    cast(from_unixtime(`movies_dwh`.`ratings`.`original_timestamp`) as date) as `rating_date`,
+    cast(from_unixtime(`movies_dwh`.`ratings`.`original_timestamp`) as time) as `rating_time`
+from
+    `movies_dwh`.`ratings`;

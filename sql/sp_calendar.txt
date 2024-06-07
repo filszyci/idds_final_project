@@ -1,0 +1,34 @@
+create procedure movies_dwh.sp_calendar()
+begin 
+	set @min_date = (select min(original_timestamp) from movies_dwh.ratings);
+	set @min_date_date = date(from_unixtime(@min_date));
+	set @n = 0;
+	drop table if exists movies_dwh.calendar;
+	create table movies_dwh.calendar
+	with add_date as (
+		select date_add(@min_date_date, interval value day) as date_key from movies_dwh.calendar_series
+	),
+	calendar as (
+	  SELECT
+	   date_key,
+	   date(date_key) AS date_short,
+	   date_format(date_key, '%Y') AS `year`,
+	   date_format(date_key, '%c') AS month_no,
+	   date_format(date_key, '%M') AS month_name,
+	   date_format(date_key, '%b') AS month_name_short,
+	   date_format(date_key, '%e') AS day_of_month_no,
+	   quarter(date_key) AS `quarter`,
+	   date_format(date_key, '%U') AS week_no,
+	   date_format(date_key, '%V') AS week_no_iso,
+	   date_format(date_key, '%u') AS weekday_no,
+	   date_format(date_key, '%W') AS weekday_name
+	  FROM add_date
+	)
+	select DISTINCT * 
+	from calendar order by date_key;
+	
+end
+
+call movies_dwh.sp_calendar ();
+
+select * from movies_dwh.calendar;

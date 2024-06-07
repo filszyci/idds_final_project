@@ -1,0 +1,16 @@
+create table if not exists movies_transactions.users (
+	user_id INT,
+	user_name VARCHAR(255),
+	constraint pk_user primary key (user_id)
+);
+
+insert into movies_transactions.users (user_id, user_name) 
+select distinct user_id, null as user_name from movies_raw.ratings;
+
+insert into movies_transactions.ratings (user_id, movie_id, rating, original_timestamp)
+select 
+	user_id,
+	movie_id,
+	rating,
+	original_timestamp
+from movies_raw.ratings;
